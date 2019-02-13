@@ -12,6 +12,7 @@ import Typography from '@material-ui/core/Typography';
 
 import withTheme from '../tools/withTheme';
 import ConnectionWindow from './ConnectionWindow';
+import AddNewConnectionDialog from '../components/AddConnectionDialog';
 
 const styles = {
   root: {
@@ -32,51 +33,74 @@ class Main extends Component {
 
     this.state = {
       currentConnection: 0,
-      connections: []
+      connections: [],
+      addingNewConnection: false
     };
   }
 
-  handleChange = (event, value) => {
+  handleTabChange = (event, value) => {
     this.setState({ currentConnection: value });
   };
+
+  addNewConnection = () => {
+    this.setState({ addingNewConnection: true });
+  }
+
+  closeAddConnection = () => {
+    this.setState({ addingNewConnection: false });
+  }
+
+  handleConnect = (connectionInfo) => {
+    const newConnection = {
+      ...connectionInfo,
+      id: Date.now().toString()
+    };
+
+    this.setState({
+      connections: [...this.state.connections, newConnection],
+      currentConnection: this.state.connections.length
+    });
+
+    this.closeAddConnection();
+  }
 
   render() {
     const { classes } = this.props;
     return (
-      <div>
-        <div className={classes.root}>
-          <AppBar position="static" color="default">
-            <Toolbar>
-              <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
-                <MenuIcon />
-              </IconButton>
-              <Tabs
-                value={this.state.currentConnection}
-                onChange={this.handleChange}
-                indicatorColor="primary"
-                textColor="primary">
-                {this.state.connections.map(con => (
-                  <Tab key={con.id} label={con.name} />
-                ))}
-              </Tabs>
-              <Fab size="small" color="primary" aria-label="Add" className={classes.fab}>
-                <AddIcon />
-              </Fab>
-            </Toolbar>
-          </AppBar>
-          <Typography component="div">
-            {this.state.connections.map((con, index) => (
-              <Typography key={con.id} component="div"
-                style={{ display: this.state.currentConnection !== index && 'none' }}>
-                <ConnectionWindow
-                  key={con.id}
-                  connection={con} />
-              </Typography>
-            ))}
-          </Typography>
-        </div>
-        <div>
-        </div>
+      <div className={classes.root}>
+        <AppBar position="static" color="default">
+          <Toolbar>
+            <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
+              <MenuIcon />
+            </IconButton>
+            <Tabs
+              value={this.state.currentConnection}
+              onChange={this.handleTabChange}
+              indicatorColor="primary"
+              textColor="primary">
+              {this.state.connections.map(con => (
+                <Tab key={con.id} label={con.name} />
+              ))}
+            </Tabs>
+            <Fab size="small" color="primary" aria-label="Add" className={classes.fab}
+              onClick={this.addNewConnection}>
+              <AddIcon />
+            </Fab>
+          </Toolbar>
+        </AppBar>
+        <Typography component="div">
+          {this.state.connections.map((con, index) => (
+            <Typography key={con.id} component="div"
+              style={{ display: this.state.currentConnection !== index && 'none' }}>
+              <ConnectionWindow
+                key={con.id}
+                connection={con} />
+            </Typography>
+          ))}
+        </Typography>
+        {this.state.addingNewConnection && <AddNewConnectionDialog
+          onClose={this.closeAddConnection}
+          onConnect={this.handleConnect} />}
       </div>
     );
   }
