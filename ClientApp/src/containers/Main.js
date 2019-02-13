@@ -8,8 +8,10 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
 
 import withTheme from '../tools/withTheme';
+import ConnectionWindow from './ConnectionWindow';
 
 const styles = {
   root: {
@@ -30,7 +32,7 @@ class Main extends Component {
 
     this.state = {
       currentConnection: 0,
-      connections: [{ id: 1, name: 'My service bus' }, { id: 2, name: 'My service bus 1' }]
+      connections: []
     };
   }
 
@@ -62,6 +64,16 @@ class Main extends Component {
               </Fab>
             </Toolbar>
           </AppBar>
+          <Typography component="div">
+            {this.state.connections.map((con, index) => (
+              <Typography key={con.id} component="div"
+                style={{ display: this.state.currentConnection !== index && 'none' }}>
+                <ConnectionWindow
+                  key={con.id}
+                  connection={con} />
+              </Typography>
+            ))}
+          </Typography>
         </div>
         <div>
         </div>
